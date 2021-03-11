@@ -1,4 +1,7 @@
 import speedtest
+import subprocess
+
+
 
 class InternetSpeedTest(speedtest.Speedtest):
     def __init__(self):
@@ -17,12 +20,19 @@ class InternetSpeedTest(speedtest.Speedtest):
             upload /= 10
         upload = "{:.2f}".format(upload)
         return float(upload)
+
+    def get_wifi_name(self):
+        strDetails = str(subprocess.check_output("netsh wlan show interfaces"))
+        listDetails = strDetails.split(":")
+        wifiname = listDetails[12].split("\\r")[0]
+        wifiname = wifiname.replace(wifiname[0], "")
+        return wifiname
     
     def get_results(self):
         download = self.get_download()
         upload = self.get_upload()
         ping = self.results.ping
-        return {'download': download, 'upload': upload, 'ping': ping}
+        wifiname = self.get_wifi_name()
+        return {'wifiname': wifiname ,'download': download, 'upload': upload, 'ping': ping}
 
 st = InternetSpeedTest()
-print(st.get_results())
